@@ -1,75 +1,43 @@
-<!doctype html>
-<html lang="th">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Aimbot UI — Dark Edition</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aimbot UI</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #0d1117; /* Dark background */
+      color: #e6edf3;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .btn {
+      padding: 20px 60px;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(135deg, #238636, #2ea043);
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(35,134,54,0.6);
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      background: linear-gradient(135deg, #2ea043, #3fb950);
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(63,185,80,0.8);
+    }
+    .btn:active {
+      transform: scale(0.95);
+    }
+  </style>
 </head>
 <body>
-<main class="wrap" role="main">
-  <section class="card" aria-labelledby="title">
-    <div class="header">
-      <h1 id="title">AIMBOT</h1>
-      <p class="tagline">UI Demo • Prank mode — ไม่มีการเชื่อมต่อเกมใดๆ</p>
-    </div>
-
-    <div class="center-area">
-      <button id="aimBtn" class="aim-button" aria-pressed="false" title="กดเพื่อเปิด/ปิด aimbot (UI เท่านั้น)">
-        <span class="ring"></span>
-        <span class="label">Aimbot</span>
-      </button>
-    </div>
-
-    <div id="controls" class="controls" aria-hidden="true">
-      <div class="control-row">
-        <label for="sensitivity" class="control-label">Sensitivity</label>
-        <input id="sensitivity" type="range" min="1" max="100" value="72" />
-        <div id="sensVal" class="val">72</div>
-      </div>
-
-      <div class="control-row">
-        <label class="control-label">Mode</label>
-        <div class="mode-group" role="tablist" aria-label="Mode selector">
-          <button class="mode active" data-mode="smooth" role="tab" aria-selected="true">Smooth</button>
-          <button class="mode" data-mode="snap" role="tab" aria-selected="false">Snap</button>
-        </div>
-      </div>
-
-      <div class="stats" aria-live="polite">
-        <div class="stat">
-          <div class="num" id="stat-lock">0</div>
-          <div class="label2">Locks</div>
-        </div>
-        <div class="stat">
-          <div class="num" id="stat-acc">0%</div>
-          <div class="label2">Accuracy</div>
-        </div>
-      </div>
-    </div>
-
-    <footer class="footer">
-      <small>Tip: กด <kbd>Space</kbd> เพื่อเปิด/ปิด | ปุ่มนี้เป็น UI จำลองเท่านั้น</small>
-    </footer>
-  </section>
-</main>
-
-<!-- modal -->
-<div id="modal" class="modal" aria-hidden="true">
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <h2 id="modalTitle">Initializing Aimbot UI...</h2>
-    <div class="modal-body">
-      <div id="console" class="console" aria-hidden="false">
-        <code>> Boot sequence started...</code>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button id="closeModal" class="btn">Close</button>
-      <button id="resetBtn" class="btn ghost">Reset</button>
-    </div>
-  </div>
-</div>
-
-<script src="script.js"></script>
+  <button class="btn">Aimbot</button>
 </body>
 </html>
