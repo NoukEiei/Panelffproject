@@ -57,19 +57,37 @@ h1{
 
 .aim-btn{
   position:relative;
-  width:220px; height:60px;
-  border-radius:12px;
+  width:260px; height:70px;
   border:none;
+  border-radius:14px;
   cursor:pointer;
-  background:linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01));
-  box-shadow: 0 15px 50px rgba(3,8,18,0.6), inset 0 -6px 20px rgba(0,0,0,0.28);
-  display:flex; align-items:center; justify-content:center;
-  transition: transform .16s cubic-bezier(.2,.9,.2,1), box-shadow .18s ease;
-  outline:none;
+  background:linear-gradient(135deg, rgba(51,215,255,0.15), rgba(155,107,255,0.15));
+  color:#e9fbff;
+  font-size:24px; font-weight:900; letter-spacing:2px;
+  text-transform:uppercase;
+  overflow:hidden;
+  transition: all .2s ease;
+  box-shadow:0 0 20px rgba(51,215,255,0.25), 0 0 40px rgba(155,107,255,0.15);
 }
-.aim-btn:active{transform:scale(.97)}
+.aim-btn::before{
+  content:"";
+  position:absolute;
+  top:0; left:-100%;
+  width:100%; height:100%;
+  background:linear-gradient(120deg, transparent, rgba(255,255,255,0.25), transparent);
+  transition:all .5s;
+}
+.aim-btn:hover::before{ left:100%; }
+.aim-btn:hover{
+  box-shadow:0 0 30px rgba(51,215,255,0.35), 0 0 60px rgba(155,107,255,0.25);
+  transform:translateY(-2px);
+}
+.aim-btn:active{
+  transform:scale(0.97);
+  box-shadow:0 0 10px rgba(51,215,255,0.5), 0 0 20px rgba(155,107,255,0.4);
+}
 
-.aim-label{font-weight:800; font-size:22px; letter-spacing:1px; color:#e9fbff}
+.aim-label{position:relative; z-index:2;}
 
 .badge{
   position:absolute; top:-20px; left:50%; transform:translateX(-50%) translateY(-6px);
