@@ -1,39 +1,136 @@
-// script.js — behavior for the fake UI
+// script.js — behavior for the fake UI v2 (dark, improved UX, no ESP)
 document.addEventListener('DOMContentLoaded', ()=>{
 
   const aimBtn = document.getElementById('aimBtn');
-  const modal = document.getElementById('modal');
-  const consoleEl = document.getElementById('console');
-  const modalTitle = document.getElementById('modalTitle');
-  const closeModal = document.getElementById('closeModal');
-  const resetBtn = document.getElementById('resetBtn');
   const controls = document.getElementById('controls');
+  const sensitivity = document.getElementById('sensitivity');
+  const sensVal = document.getElementById('sensVal');
   const statLock = document.getElementById('stat-lock');
   const statAcc = document.getElementById('stat-acc');
-  const statEsp = document.getElementById('stat-esp');
-  const strength = document.getElementById('strength');
-  const strVal = document.getElementById('strVal');
+  const modal = document.getElementById('modal');
+  const consoleEl = document.getElementById('console');
+  const closeModal = document.getElementById('closeModal');
+  const resetBtn = document.getElementById('resetBtn');
+  const modeBtns = document.querySelectorAll('.mode');
 
   let running=false;
-  let locks=0, espHits=0, accuracy=0;
+  let locks=0, accuracy=0;
+  let mode = 'smooth';
 
-  // update strength label
-  strength.addEventListener('input', ()=> strVal.textContent = strength.value);
+  // init UI
+  sensVal.textContent = sensitivity.value;
 
-  aimBtn.addEventListener('click', ()=> {
-    aimBtn.classList.add('glow');
-    if(!running){
-      startFakeSequence();
-    } else {
-      // toggle off
-      stopFakeSequence();
+  sensitivity.addEventListener('input', ()=> {
+    sensVal.textContent = sensitivity.value;
+  });
+
+  modeBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      modeBtns.forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected','true');
+      mode = btn.dataset.mode;
+      appendConsole("> Mode set to " + mode);
+    });
+  });
+
+  // keyboard shortcut Space to toggle
+  document.addEventListener('keydown', (e)=>{
+    if(e.code==='Space'){
+      e.preventDefault();
+      aimBtn.click();
     }
   });
 
-  function startFakeSequence(){
-    running=true;
-    aimBtn.textContent = "Starting...";
-    // show controls
+  aimBtn.addEventListener('click', ()=> {
+    if(!running){
+      startSequence();
+    } else {
+      stopSequence();
+    }
+  });
+
+  function startSequence(){
+    running = true;
+    aimBtn.classList.add('on');
+    aimBtn.setAttribute('aria-pressed','true');
+    controls.classList.add('show');
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+    document.getElementById('modalTitle').textContent = "Booting Aimbot UI...";
+    consoleEl.innerHTML = "<code>> Initializing...</code>\n";
+    fakeLog([
+      "> Loading aim-engine (demo)...",
+      "> Calibrating sensitivity: " + sensitivity.value,
+      "> Applying " + mode + " smoothing",
+      "> Aligning crosshair overlay (UI only)",
+      "> Finalizing..."
+    ], 700, ()=> {
+      appendConsole("> Ready. This is a simulated UI only.");
+      aimBtn.querySelector('.label').textContent = "Aimbot (ON)";
+      // start stat updates
+      statTick();
+    });
+  }
+
+  function stopSequence(){
+    running = false;
+    aimBtn.classList.remove('on');
+    aimBtn.setAttribute('aria-pressed','false');
+    controls.classList.remove('show');
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden','true');
+    aimBtn.querySelector('.label').textContent = "Aimbot";
+    appendConsole("> Shutdown complete.");
+  }
+
+  function fakeLog(lines, interval=600, cb){
+    let i=0;
+    (function next(){
+      if(i>=lines.length){ if(cb) cb(); return; }
+      appendConsole(lines[i++]);
+      setTimeout(next, interval + Math.random()*300);
+    })();
+  }
+
+  function appendConsole(text){
+    consoleEl.innerHTML += "<code>" + text + "</code>\n";
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+  }
+
+  function statTick(){
+    if(!running) return;
+    const s = Number(sensitivity.value);
+    // smooth mode increases gradually, snap gives sharper jumps
+    if(mode === 'smooth'){
+      locks += Math.round(0.3 + s/60 * (Math.random()*1.6));
+      accuracy = Math.min(99, Math.round(60 + s*0.35 + Math.random()*8));
+    } else {
+      locks += Math.round(0.6 + s/40 * (Math.random()*2.6));
+      accuracy = Math.min(99, Math.round(50 + s*0.6 + Math.random()*12));
+    }
+
+    statLock.textContent = locks;
+    statAcc.textContent = accuracy + "%";
+
+    if(Math.random() > 0.7) appendConsole("> Lock acquired. confidence: " + accuracy + "%");
+
+    setTimeout(statTick, 1200 + Math.random()*1400);
+  }
+
+  closeModal.addEventListener('click', ()=>{
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden','true');
+  });
+
+  resetBtn.addEventListener('click', ()=>{
+    locks=0; accuracy=0;
+    statLock.textContent = locks;
+    statAcc.textContent = accuracy + "%";
+    consoleEl.innerHTML = "<code>> Reset complete.</code>\n";
+  });
+
+});
     controls.setAttribute('aria-hidden','false');
     controls.style.opacity=1;
     // open modal
