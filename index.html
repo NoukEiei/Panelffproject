@@ -1,43 +1,359 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aimbot UI</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #0d1117; /* Dark background */
-      color: #e6edf3;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .btn {
-      padding: 20px 60px;
-      font-size: 2rem;
-      font-weight: bold;
-      color: #fff;
-      background: linear-gradient(135deg, #238636, #2ea043);
-      border: none;
-      border-radius: 15px;
-      cursor: pointer;
-      box-shadow: 0 0 20px rgba(35,134,54,0.6);
-      transition: all 0.3s ease;
-    }
-    .btn:hover {
-      background: linear-gradient(135deg, #2ea043, #3fb950);
-      transform: scale(1.05);
-      box-shadow: 0 0 30px rgba(63,185,80,0.8);
-    }
-    .btn:active {
-      transform: scale(0.95);
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Aimbot — Dark UI (Demo)</title>
+<style>
+  :root{
+    --bg:#07080b;
+    --card:#0c1116;
+    --muted:#9fb9c9;
+    --accent1:#33d7ff;
+    --accent2:#9b6bff;
+    --glass:rgba(255,255,255,0.03);
+    --radius:18px;
+    --shadow: rgba(2,6,23,0.7);
+    --font: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:var(--font);
+    background:
+      radial-gradient(800px 380px at 12% 18%, rgba(51,215,255,0.04), transparent),
+      radial-gradient(600px 300px at 88% 82%, rgba(155,107,255,0.03), transparent),
+      var(--bg);
+    color:#e7f7ff;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+  }
+
+  /* Card wrapper */
+  .card{
+    width:min(760px,94vw);
+    border-radius:var(--radius);
+    padding:28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.008));
+    box-shadow:0 30px 80px var(--shadow);
+    border:1px solid rgba(255,255,255,0.03);
+    text-align:center;
+    backdrop-filter: blur(8px) saturate(120%);
+  }
+
+  h1{
+    margin:0; font-size:22px; letter-spacing:2px;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .tagline{margin-top:6px; color:var(--muted); font-size:13px}
+
+  /* center area */
+  .center{
+    display:flex; align-items:center; justify-content:center;
+    padding:28px 0 14px;
+    position:relative;
+  }
+
+  /* The big circular button */
+  .aim-btn{
+    position:relative;
+    width:170px; height:170px;
+    border-radius:50%;
+    border:none;
+    cursor:pointer;
+    background:linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01));
+    box-shadow: 0 18px 60px rgba(3,8,18,0.6), inset 0 -10px 30px rgba(0,0,0,0.28);
+    display:flex; align-items:center; justify-content:center;
+    transition: transform .16s cubic-bezier(.2,.9,.2,1), box-shadow .18s ease;
+    outline:none;
+  }
+  .aim-btn:active{transform:scale(.97)}
+
+  .aim-label{font-weight:800; font-size:20px; letter-spacing:1px; color:#e9fbff}
+
+  /* neon ring (animated) */
+  .ring {
+    position:absolute; inset:0; border-radius:50%;
+    pointer-events:none; transform:scale(1); transition: all .25s ease;
+    box-shadow: 0 0 30px rgba(51,215,255,0.06), 0 0 70px rgba(155,107,255,0.03);
+  }
+  .aim-btn.on .ring{
+    box-shadow: 0 0 80px rgba(51,215,255,0.22), 0 0 160px rgba(155,107,255,0.14);
+    animation: pulse 1.6s infinite;
+    transform:scale(1.06);
+  }
+  @keyframes pulse{
+    0%{filter:brightness(1); transform:scale(1.02)}
+    50%{filter:brightness(1.08); transform:scale(1.08)}
+    100%{filter:brightness(1); transform:scale(1.02)}
+  }
+
+  /* Activated badge */
+  .badge{
+    position:absolute; top:-18px; left:50%; transform:translateX(-50%) translateY(-6px);
+    padding:6px 12px; border-radius:999px;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#041021; font-weight:700; font-size:13px; box-shadow:0 10px 34px rgba(11,27,48,0.6);
+    opacity:0; transform-origin:center;
+    transition: all .28s cubic-bezier(.2,.9,.25,1);
+    pointer-events:none;
+  }
+  .badge.show{ opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
+
+  /* Controls area (hidden until ON) */
+  .controls{
+    margin-top:10px; display:none; gap:12px; padding-top:8px;
+  }
+  .controls.show{ display:flex; flex-direction:column; align-items:center; }
+
+  .control-row{display:flex; gap:12px; align-items:center}
+  .control-label{color:var(--muted); font-weight:700; width:110px; text-align:left}
+  input[type="range"]{width:220px}
+
+  .modes{display:flex; gap:8px}
+  .mode{
+    padding:8px 12px; border-radius:10px; background:transparent; border:1px solid rgba(255,255,255,0.03);
+    color:#cfeefd; cursor:pointer; font-weight:600;
+  }
+  .mode.active{ background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#041021; box-shadow:0 10px 30px rgba(11,27,48,0.55) }
+
+  .stats{display:flex; gap:20px; justify-content:center; margin-top:12px}
+  .stat{text-align:center}
+  .stat .num{font-weight:800; font-size:20px; color:var(--accent1)}
+  .stat .label{font-size:12px; color:var(--muted)}
+
+  .footer{margin-top:14px; color:var(--muted); font-size:13px}
+  kbd{background:#071127; padding:4px 6px; border-radius:6px; border:1px solid rgba(255,255,255,0.02)}
+
+  /* Modal console */
+  .modal{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background: rgba(1,6,14,0.5); backdrop-filter: blur(6px); opacity:0; pointer-events:none; transition:all .18s ease;
+  }
+  .modal.show{ opacity:1; pointer-events:auto }
+  .modal-card{
+    width:min(640px,92vw); padding:18px; border-radius:12px; background:linear-gradient(180deg,#05111a,#071127);
+    border:1px solid rgba(255,255,255,0.03); box-shadow:0 20px 60px rgba(2,8,22,0.7);
+  }
+  .console{height:140px; overflow:auto; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:8px; padding:12px; font-family:monospace; color:#bfefff;}
+
+  /* small responsive tweaks */
+  @media (max-width:520px){
+    .aim-btn{width:140px;height:140px}
+    input[type="range"]{width:140px}
+    .control-label{width:90px}
+  }
+</style>
 </head>
 <body>
-  <button class="btn">Aimbot</button>
+  <section class="card" role="region" aria-label="Aimbot demo UI">
+    <h1>AIMBOT</h1>
+    <div class="tagline">UI Demo • Prank mode — ไม่มีการเชื่อมต่อเกมใดๆ</div>
+
+    <div class="center" aria-hidden="false">
+      <div class="badge" id="badge">Activated!</div>
+
+      <button id="aimBtn" class="aim-btn" aria-pressed="false" aria-label="Aimbot toggle button">
+        <span class="ring" aria-hidden="true"></span>
+        <span class="aim-label">Aimbot</span>
+      </button>
+    </div>
+
+    <div id="controls" class="controls" aria-hidden="true">
+      <div class="control-row">
+        <div class="control-label">Sensitivity</div>
+        <input id="sensitivity" type="range" min="1" max="100" value="72" />
+        <div id="sensVal" style="width:36px;text-align:right;color:var(--muted)">72</div>
+      </div>
+
+      <div class="control-row">
+        <div class="control-label">Mode</div>
+        <div class="modes" role="tablist" aria-label="Mode selector">
+          <button class="mode active" data-mode="smooth" aria-selected="true">Smooth</button>
+          <button class="mode" data-mode="snap" aria-selected="false">Snap</button>
+        </div>
+      </div>
+
+      <div class="stats" aria-live="polite">
+        <div class="stat">
+          <div class="num" id="locks">0</div>
+          <div class="label">Locks</div>
+        </div>
+        <div class="stat">
+          <div class="num" id="acc">0%</div>
+          <div class="label">Accuracy</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Tip: กด <kbd>Space</kbd> เพื่อเปิด/ปิด • ใช้เพื่อความบันเทิงเท่านั้น
+    </div>
+  </section>
+
+  <!-- Modal console -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle" style="margin:0 0 8px 0;color:#cfeefd">Boot sequence</h3>
+      <div id="console" class="console"><code>&gt; Waiting...</code></div>
+      <div style="text-align:right;margin-top:10px">
+        <button id="closeModal" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#dff6ff;cursor:pointer">Close</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const aimBtn = document.getElementById('aimBtn');
+  const badge = document.getElementById('badge');
+  const controls = document.getElementById('controls');
+  const sensitivity = document.getElementById('sensitivity');
+  const sensVal = document.getElementById('sensVal');
+  const modes = document.querySelectorAll('.mode');
+  const locksEl = document.getElementById('locks');
+  const accEl = document.getElementById('acc');
+  const modal = document.getElementById('modal');
+  const consoleEl = document.getElementById('console');
+  const closeModal = document.getElementById('closeModal');
+
+  let running = false;
+  let locks = 0;
+  let acc = 0;
+  let mode = 'smooth';
+  let statTimer = null;
+
+  // init
+  sensVal.textContent = sensitivity.value;
+
+  sensitivity.addEventListener('input', () => {
+    sensVal.textContent = sensitivity.value;
+  });
+
+  modes.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modes.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected','true');
+      mode = btn.dataset.mode;
+      appendConsole(`> Mode set to ${mode}`);
+    });
+  });
+
+  // toggle function
+  function startUI() {
+    running = true;
+    aimBtn.classList.add('on');
+    aimBtn.setAttribute('aria-pressed','true');
+    badge.classList.add('show');
+    controls.classList.add('show');
+    controls.setAttribute('aria-hidden','false');
+    modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+    consoleEl.innerHTML = '<code>&gt; Initializing Aimbot UI...</code>\n';
+    fakeLog([
+      '> Loading aim-engine (demo)...',
+      `> Calibrating sensitivity: ${sensitivity.value}`,
+      `> Applying ${mode} smoothing`,
+      '> Aligning crosshair overlay (UI only)',
+      '> Finalizing...'
+    ], 600, () => {
+      appendConsole('> Ready. This is a simulated UI only.');
+      aimBtn.querySelector('.aim-label').textContent = 'Aimbot (ON)';
+      runStats();
+    });
+  }
+
+  function stopUI() {
+    running = false;
+    aimBtn.classList.remove('on');
+    aimBtn.setAttribute('aria-pressed','false');
+    badge.classList.remove('show');
+    controls.classList.remove('show');
+    controls.setAttribute('aria-hidden','true');
+    modal.classList.remove('show'); modal.setAttribute('aria-hidden','true');
+    aimBtn.querySelector('.aim-label').textContent = 'Aimbot';
+    appendConsole('> Shutdown complete.');
+    if (statTimer) { clearTimeout(statTimer); statTimer = null; }
+  }
+
+  aimBtn.addEventListener('click', () => {
+    if (!running) startUI(); else stopUI();
+  });
+
+  // Space toggles
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      aimBtn.click();
+    } else if (e.key === 'r' || e.key === 'R') {
+      // quick reset
+      resetStats();
+      appendConsole('> Reset (keyboard)');
+    }
+  });
+
+  // modal close
+  closeModal.addEventListener('click', () => {
+    modal.classList.remove('show'); modal.setAttribute('aria-hidden','true');
+  });
+
+  // fake console logger
+  function fakeLog(lines, interval=700, cb) {
+    let i = 0;
+    (function next(){
+      if (i >= lines.length) { if (cb) cb(); return; }
+      appendConsole(lines[i++]);
+      setTimeout(next, interval + Math.random()*300);
+    })();
+  }
+  function appendConsole(text) {
+    consoleEl.innerHTML += `<code>${text}</code>\n`;
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+  }
+
+  // stats simulation
+  function runStats(){
+    if (!running) return;
+    const s = Number(sensitivity.value);
+    if (mode === 'smooth') {
+      locks += Math.round(0.3 + s/60 * (Math.random()*1.6));
+      acc = Math.min(99, Math.round(60 + s*0.35 + Math.random()*8));
+    } else {
+      locks += Math.round(0.6 + s/40 * (Math.random()*2.6));
+      acc = Math.min(99, Math.round(50 + s*0.6 + Math.random()*12));
+    }
+    locksEl.textContent = locks;
+    accEl.textContent = acc + '%';
+    if (Math.random() > 0.7) appendConsole(`> Lock acquired. confidence: ${acc}%`);
+    statTimer = setTimeout(runStats, 1200 + Math.random()*1400);
+  }
+
+  function resetStats(){
+    locks = 0; acc = 0;
+    locksEl.textContent = locks;
+    accEl.textContent = acc + '%';
+  }
+
+  // reset on long press (optional) - double click resets
+  aimBtn.addEventListener('dblclick', () => {
+    resetStats();
+    appendConsole('> Reset (double-click)');
+  });
+
+  // accessibility: focus states
+  aimBtn.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') aimBtn.click();
+  });
+
+  // small animation on load
+  setTimeout(()=> aimBtn.animate([{transform:'scale(.98)'},{transform:'scale(1)'}], {duration:700,iterations:1}), 300);
+
+})();
+</script>
 </body>
-</html>
+  </html>
