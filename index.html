@@ -11,8 +11,7 @@
   --muted:#9fb9c9;
   --accent1:#33d7ff;
   --accent2:#9b6bff;
-  --glass:rgba(255,255,255,0.03);
-  --radius:18px;
+  --radius:14px;
   --shadow: rgba(2,6,23,0.7);
   --font: Inter, "Segoe UI", Roboto, Arial, sans-serif;
 }
@@ -33,7 +32,7 @@ body{
 }
 
 .card{
-  width:min(900px,95vw);
+  width:min(800px,95vw);
   border-radius:var(--radius);
   padding:30px;
   background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.008));
@@ -44,7 +43,7 @@ body{
 }
 
 h1{
-  margin:0; font-size:26px; letter-spacing:2px;
+  margin:0; font-size:28px; letter-spacing:2px;
   background:linear-gradient(90deg,var(--accent1),var(--accent2));
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
@@ -58,12 +57,12 @@ h1{
 
 .aim-btn{
   position:relative;
-  width:180px; height:180px;
-  border-radius:50%;
+  width:220px; height:60px;
+  border-radius:12px;
   border:none;
   cursor:pointer;
   background:linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01));
-  box-shadow: 0 18px 60px rgba(3,8,18,0.6), inset 0 -10px 30px rgba(0,0,0,0.28);
+  box-shadow: 0 15px 50px rgba(3,8,18,0.6), inset 0 -6px 20px rgba(0,0,0,0.28);
   display:flex; align-items:center; justify-content:center;
   transition: transform .16s cubic-bezier(.2,.9,.2,1), box-shadow .18s ease;
   outline:none;
@@ -71,22 +70,6 @@ h1{
 .aim-btn:active{transform:scale(.97)}
 
 .aim-label{font-weight:800; font-size:22px; letter-spacing:1px; color:#e9fbff}
-
-.ring {
-  position:absolute; inset:0; border-radius:50%;
-  pointer-events:none; transform:scale(1); transition: all .25s ease;
-  box-shadow: 0 0 30px rgba(51,215,255,0.06), 0 0 70px rgba(155,107,255,0.03);
-}
-.aim-btn.on .ring{
-  box-shadow: 0 0 80px rgba(51,215,255,0.22), 0 0 160px rgba(155,107,255,0.14);
-  animation: pulse 1.6s infinite;
-  transform:scale(1.06);
-}
-@keyframes pulse{
-  0%{filter:brightness(1); transform:scale(1.02)}
-  50%{filter:brightness(1.08); transform:scale(1.08)}
-  100%{filter:brightness(1); transform:scale(1.02)}
-}
 
 .badge{
   position:absolute; top:-20px; left:50%; transform:translateX(-50%) translateY(-6px);
@@ -122,7 +105,6 @@ kbd{background:#071127; padding:4px 6px; border-radius:6px; border:1px solid rgb
 <div class="center" aria-hidden="false">
   <div class="badge" id="badge">Activated!</div>
   <button id="aimBtn" class="aim-btn" aria-pressed="false" aria-label="Aimbot toggle button">
-    <span class="ring" aria-hidden="true"></span>
     <span class="aim-label">Aimbot</span>
   </button>
 </div>
@@ -150,7 +132,7 @@ modal=document.getElementById('modal'),
 consoleEl=document.getElementById('console'),
 closeModal=document.getElementById('closeModal');
 
-let running=false, statTimer=null;
+let running=false;
 
 function appendConsole(text){
   consoleEl.innerHTML+=`<code>${text}</code><br>`;
@@ -172,13 +154,17 @@ function startUI(){
     if(progress>=100){
       appendConsole("> Injection is finished ✅✅");
       aimBtn.querySelector('.aim-label').textContent='Aimbot (ON)';
+      setTimeout(()=>{
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden','true');
+      },1000);
       return;
     }
     const text = messages[msgIndex % messages.length];
     appendConsole(`> ${text} ${progress}%`);
-    progress += Math.floor(Math.random()*5)+1; 
+    progress += Math.floor(Math.random()*7)+3;
     msgIndex++;
-    setTimeout(updateProgress, 100+Math.random()*120);
+    setTimeout(updateProgress, 60+Math.random()*50);
   }
   updateProgress();
 }
