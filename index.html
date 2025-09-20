@@ -99,27 +99,6 @@ h1{
 }
 .badge.show{ opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
 
-.controls{
-  margin-top:12px; display:none; gap:14px; padding-top:10px;
-}
-.controls.show{ display:flex; flex-direction:column; align-items:center; }
-
-.control-row{display:flex; gap:12px; align-items:center}
-.control-label{color:var(--muted); font-weight:700; width:120px; text-align:left}
-input[type="range"]{width:250px}
-
-.modes{display:flex; gap:8px}
-.mode{
-  padding:8px 14px; border-radius:10px; background:transparent; border:1px solid rgba(255,255,255,0.03);
-  color:#cfeefd; cursor:pointer; font-weight:600;
-}
-.mode.active{ background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#041021; box-shadow:0 10px 30px rgba(11,27,48,0.55) }
-
-.stats{display:flex; gap:28px; justify-content:center; margin-top:14px}
-.stat{text-align:center}
-.stat .num{font-weight:800; font-size:22px; color:var(--accent1)}
-.stat .label{font-size:13px; color:var(--muted)}
-
 .footer{margin-top:16px; color:var(--muted); font-size:13px}
 kbd{background:#071127; padding:4px 6px; border-radius:6px; border:1px solid rgba(255,255,255,0.02)}
 
@@ -148,31 +127,6 @@ kbd{background:#071127; padding:4px 6px; border-radius:6px; border:1px solid rgb
   </button>
 </div>
 
-<div id="controls" class="controls" aria-hidden="true">
-  <div class="control-row">
-    <div class="control-label">Sensitivity</div>
-    <input id="sensitivity" type="range" min="1" max="100" value="72" />
-    <div id="sensVal" style="width:36px;text-align:right;color:var(--muted)">72</div>
-  </div>
-  <div class="control-row">
-    <div class="control-label">Mode</div>
-    <div class="modes" role="tablist" aria-label="Mode selector">
-      <button class="mode active" data-mode="smooth" aria-selected="true">Smooth</button>
-      <button class="mode" data-mode="snap" aria-selected="false">Snap</button>
-    </div>
-  </div>
-  <div class="stats" aria-live="polite">
-    <div class="stat">
-      <div class="num" id="locks">0</div>
-      <div class="label">Locks</div>
-    </div>
-    <div class="stat">
-      <div class="num" id="acc">0%</div>
-      <div class="label">Accuracy</div>
-    </div>
-  </div>
-</div>
-
 <div class="footer">
 Tip: กด <kbd>Space</kbd> เพื่อเปิด/ปิด • ใช้เพื่อความบันเทิงเท่านั้น
 </div>
@@ -180,8 +134,8 @@ Tip: กด <kbd>Space</kbd> เพื่อเปิด/ปิด • ใช้
 
 <div id="modal" class="modal" aria-hidden="true">
 <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-  <h3 id="modalTitle" style="margin:0 0 8px 0;color:#cfeefd">กำลังเปิด</h3>
-  <div id="console" class="console"><code>&gt; กำลังเปิด Aimbot...</code></div>
+  <h3 id="modalTitle" style="margin:0 0 8px 0;color:#cfeefd">Initializing...</h3>
+  <div id="console" class="console"><code>&gt; Preparing...</code></div>
   <div style="text-align:right;margin-top:10px">
     <button id="closeModal" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#dff6ff;cursor:pointer">Close</button>
   </div>
@@ -192,64 +146,55 @@ Tip: กด <kbd>Space</kbd> เพื่อเปิด/ปิด • ใช้
 (() => {
 const aimBtn=document.getElementById('aimBtn'),
 badge=document.getElementById('badge'),
-controls=document.getElementById('controls'),
-sensitivity=document.getElementById('sensitivity'),
-sensVal=document.getElementById('sensVal'),
-modes=document.querySelectorAll('.mode'),
-locksEl=document.getElementById('locks'),
-accEl=document.getElementById('acc'),
 modal=document.getElementById('modal'),
 consoleEl=document.getElementById('console'),
 closeModal=document.getElementById('closeModal');
 
-let running=false, locks=0, acc=0, mode='smooth', statTimer=null;
+let running=false, statTimer=null;
 
-sensVal.textContent=sensitivity.value;
-sensitivity.addEventListener('input',()=>{sensVal.textContent=sensitivity.value});
-
-modes.forEach(btn=>{
-btn.addEventListener('click',()=>{
-  modes.forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false');});
-  btn.classList.add('active'); btn.setAttribute('aria-selected','true'); mode=btn.dataset.mode; appendConsole(`> Mode set to ${mode}`);
-})
-});
+function appendConsole(text){
+  consoleEl.innerHTML+=`<code>${text}</code><br>`;
+  consoleEl.scrollTop=consoleEl.scrollHeight;
+}
 
 function startUI(){
-running=true;
-aimBtn.classList.add('on'); aimBtn.setAttribute('aria-pressed','true');
-badge.classList.add('show'); controls.classList.add('show'); controls.setAttribute('aria-hidden','false');
-modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
-consoleEl.innerHTML='&gt; กำลังเปิด Aimbot...<br>';
-aimBtn.querySelector('.aim-label').textContent='Aimbot (ON)';
-runStats();
+  running=true;
+  aimBtn.classList.add('on'); aimBtn.setAttribute('aria-pressed','true');
+  badge.classList.add('show');
+  modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+
+  let progress = 0;
+  consoleEl.innerHTML = '';
+  const messages = ["Initializing Aimbot","Loading Modules","Calibrating Targeting","Finalizing Setup"];
+  let msgIndex = 0;
+
+  function updateProgress(){
+    if(progress>=100){
+      appendConsole("> Injection is finished ✅✅");
+      aimBtn.querySelector('.aim-label').textContent='Aimbot (ON)';
+      return;
+    }
+    const text = messages[msgIndex % messages.length];
+    appendConsole(`> ${text} ${progress}%`);
+    progress += Math.floor(Math.random()*5)+1; 
+    msgIndex++;
+    setTimeout(updateProgress, 100+Math.random()*120);
+  }
+  updateProgress();
 }
 
 function stopUI(){
-running=false;
-aimBtn.classList.remove('on'); aimBtn.setAttribute('aria-pressed','false');
-badge.classList.remove('show'); controls.classList.remove('show'); controls.setAttribute('aria-hidden','true');
-modal.classList.remove('show'); modal.setAttribute('aria-hidden','true');
-aimBtn.querySelector('.aim-label').textContent='Aimbot';
-if(statTimer){clearTimeout(statTimer);statTimer=null;}
-appendConsole('> ปิดแล้ว');
+  running=false;
+  aimBtn.classList.remove('on'); aimBtn.setAttribute('aria-pressed','false');
+  badge.classList.remove('show');
+  modal.classList.remove('show'); modal.setAttribute('aria-hidden','true');
+  aimBtn.querySelector('.aim-label').textContent='Aimbot';
 }
 
 aimBtn.addEventListener('click',()=>{running?stopUI():startUI();});
-document.addEventListener('keydown',(e)=>{if(e.code==='Space'){e.preventDefault();aimBtn.click();} else if(e.key==='r'||e.key==='R'){resetStats(); appendConsole('> รีเซ็ต (keyboard)');}});
+document.addEventListener('keydown',(e)=>{if(e.code==='Space'){e.preventDefault();aimBtn.click();}});
 closeModal.addEventListener('click',()=>{modal.classList.remove('show'); modal.setAttribute('aria-hidden','true');});
 
-function appendConsole(text){consoleEl.innerHTML+=`<code>${text}</code><br>`;consoleEl.scrollTop=consoleEl.scrollHeight;}
-function runStats(){
-if(!running)return;
-const s=Number(sensitivity.value);
-if(mode==='smooth'){locks+=Math.round(0.3+s/60*(Math.random()*1.6)); acc=Math.min(99,Math.round(60+s*0.35+Math.random()*8));}
-else{locks+=Math.round(0.6+s/40*(Math.random()*2.6)); acc=Math.min(99,Math.round(50+s*0.6+Math.random()*12));}
-locksEl.textContent=locks; accEl.textContent=acc+'%';
-if(Math.random()>0.7)appendConsole(`> Lock acquired. confidence: ${acc}%`);
-statTimer=setTimeout(runStats,1200+Math.random()*1400);
-}
-function resetStats(){locks=0; acc=0; locksEl.textContent=locks; accEl.textContent=acc+'%';}
-aimBtn.addEventListener('dblclick',()=>{resetStats(); appendConsole('> รีเซ็ต (double-click)');});
 })();
 </script>
 </body>
