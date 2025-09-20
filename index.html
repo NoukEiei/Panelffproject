@@ -3,64 +3,69 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Aimbot UI — Totally Real™</title>
+<title>Aimbot UI — Dark Edition</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="bg"></div>
-
-<main class="center">
-  <div class="card">
-    <h1 class="title">AIM ASSIST</h1>
-    <p class="subtitle">Premium UI — 100% Totally Real*</p>
-
-    <div class="button-wrap">
-      <button id="aimBtn" class="big-btn">Aimbot</button>
+<main class="wrap" role="main">
+  <section class="card" aria-labelledby="title">
+    <div class="header">
+      <h1 id="title">AIMBOT</h1>
+      <p class="tagline">UI Demo • Prank mode — ไม่มีการเชื่อมต่อเกมใดๆ</p>
     </div>
 
-    <div class="controls" id="controls" aria-hidden="true">
-      <div class="row">
-        <label class="switch">
-          <input type="checkbox" id="toggleLock" />
-          <span class="slider"></span>
-        </label>
-        <div class="label">Lock-on</div>
+    <div class="center-area">
+      <button id="aimBtn" class="aim-button" aria-pressed="false" title="กดเพื่อเปิด/ปิด aimbot (UI เท่านั้น)">
+        <span class="ring"></span>
+        <span class="label">Aimbot</span>
+      </button>
+    </div>
+
+    <div id="controls" class="controls" aria-hidden="true">
+      <div class="control-row">
+        <label for="sensitivity" class="control-label">Sensitivity</label>
+        <input id="sensitivity" type="range" min="1" max="100" value="72" />
+        <div id="sensVal" class="val">72</div>
       </div>
 
-      <div class="row">
-        <label class="switch">
-          <input type="checkbox" id="toggleVis" />
-          <span class="slider"></span>
-        </label>
-        <div class="label">ESP</div>
+      <div class="control-row">
+        <label class="control-label">Mode</label>
+        <div class="mode-group" role="tablist" aria-label="Mode selector">
+          <button class="mode active" data-mode="smooth" role="tab" aria-selected="true">Smooth</button>
+          <button class="mode" data-mode="snap" role="tab" aria-selected="false">Snap</button>
+        </div>
       </div>
 
-      <div class="row range-row">
-        <div class="label">Strength</div>
-        <input id="strength" type="range" min="1" max="100" value="75">
-        <div id="strVal" class="small">75</div>
-      </div>
-
-      <div class="stats">
-        <div><strong id="stat-lock">0</strong><small>Locks</small></div>
-        <div><strong id="stat-acc">0%</strong><small>Accuracy</small></div>
-        <div><strong id="stat-esp">0</strong><small>ESP Hits</small></div>
+      <div class="stats" aria-live="polite">
+        <div class="stat">
+          <div class="num" id="stat-lock">0</div>
+          <div class="label2">Locks</div>
+        </div>
+        <div class="stat">
+          <div class="num" id="stat-acc">0%</div>
+          <div class="label2">Accuracy</div>
+        </div>
       </div>
     </div>
 
-    <p class="foot">*This is a UI-only prank. ไม่มีการต่อเชื่อมเกมใดๆ</p>
-  </div>
+    <footer class="footer">
+      <small>Tip: กด <kbd>Space</kbd> เพื่อเปิด/ปิด | ปุ่มนี้เป็น UI จำลองเท่านั้น</small>
+    </footer>
+  </section>
 </main>
 
-<!-- Modal / Fake Console -->
+<!-- modal -->
 <div id="modal" class="modal" aria-hidden="true">
-  <div class="modal-card">
-    <h2 id="modalTitle">Initializing...</h2>
-    <pre id="console" class="console">> Preparing modules...
-> Calibrating aim... </pre>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">Initializing Aimbot UI...</h2>
+    <div class="modal-body">
+      <div id="console" class="console" aria-hidden="false">
+        <code>> Boot sequence started...</code>
+      </div>
+    </div>
     <div class="modal-actions">
-      <button id="closeModal" class="small-btn">Close</button>
-      <button id="resetBtn" class="small-btn ghost">Reset</button>
+      <button id="closeModal" class="btn">Close</button>
+      <button id="resetBtn" class="btn ghost">Reset</button>
     </div>
   </div>
 </div>
